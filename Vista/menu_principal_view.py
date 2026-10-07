@@ -6,6 +6,9 @@ from Vista.nuevo_requerimiento_view import NuevoRequerimientoView
 from Vista.consultar_requerimiento_view import ConsultarRequerimientoView
 from Vista.nuevo_postulante_view import NuevoPostulanteView
 from Vista.consultar_postulante_view import ConsultarPostulanteView
+from Vista.listar_requerimientos_view import ListarRequerimientosView  
+from Vista.listar_postulantes_view import ListarPostulantesView  
+from Vista.informacion_sistema_view import InformacionSistemaView  
 
 class MenuPrincipalView:
 
@@ -37,6 +40,12 @@ class MenuPrincipalView:
     NuevoPostulanteView(self.ventana)
   def abrir_consultar_postulante(self):
     ConsultarPostulanteView(self.ventana)
+  def abrir_listar_requerimientos(self):  
+    ListarRequerimientosView(self.ventana)
+  def abrir_listar_postulantes(self):  
+    ListarPostulantesView(self.ventana)
+  def abrir_informacion_sistema(self):  
+    InformacionSistemaView(self.ventana)
   def crear_menu(self):
     barra_menu = tk.Menu(self.ventana)
 
@@ -68,11 +77,11 @@ class MenuPrincipalView:
     menu_listar = tk.Menu(barra_menu, tearoff=0)
     menu_listar.add_command(
         label="Listar requerimientos",
-        command=lambda: self.mostrar_mensaje("Listar requerimientos"),
+        command=self.abrir_listar_requerimientos,
     )
     menu_listar.add_command(
         label="Listar postulantes",
-        command=lambda: self.mostrar_mensaje("Listar postulantes"),
+        command=self.abrir_listar_postulantes,
     )
     barra_menu.add_cascade(label="Listar", menu=menu_listar)
 
@@ -80,7 +89,7 @@ class MenuPrincipalView:
     menu_acerca = tk.Menu(barra_menu, tearoff=0)
     menu_acerca.add_command(
         label="Información del sistema",
-        command=lambda: self.mostrar_mensaje("Información del sistema"),
+        command=self.abrir_informacion_sistema,
     )
     menu_acerca.add_separator()
     menu_acerca.add_command(label="Salir", command=self.ventana.quit)
