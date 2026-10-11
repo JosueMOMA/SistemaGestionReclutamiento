@@ -76,25 +76,33 @@ class PostulanteController:
             messagebox.showerror("Error", f"Verifique los datos ingresados. Detalle: {str(e)}")
 
     def xConsultarPostulante(self):
-        xIdBusqueda = self.xVistaConsultar.txt_id.get()
+        xIdBusqueda = self.xVistaConsultar.txt_id.get().strip()
+        if not xIdBusqueda:
+            messagebox.showwarning("Advertencia", "Por favor ingrese un ID de postulante.")
+            return
+
         try:
             xPost = self.xEmpresa.consultar_postulante(xIdBusqueda)
-            
-            self.xVistaConsultar.txt_ape_pat.config(state="normal")
-            self.xVistaConsultar.txt_ape_pat.delete(0, "end")
-            self.xVistaConsultar.txt_ape_pat.insert(0, xPost.apellido_paterno)
-            self.xVistaConsultar.txt_ape_pat.config(state="readonly")
-
-            self.xVistaConsultar.txt_nombres.config(state="normal")
-            self.xVistaConsultar.txt_nombres.delete(0, "end")
-            self.xVistaConsultar.txt_nombres.insert(0, xPost.nombres)
-            self.xVistaConsultar.txt_nombres.config(state="readonly")
-
-            xSueldoNeto = xPost.calcular_sueldo_neto()
-            self.xVistaConsultar.txt_sueldo_neto.config(state="normal")
-            self.xVistaConsultar.txt_sueldo_neto.delete(0, "end")
-            self.xVistaConsultar.txt_sueldo_neto.insert(0, f"S/ {xSueldoNeto:.2f}")
-            self.xVistaConsultar.txt_sueldo_neto.config(state="readonly")
+            xVista = self.xVistaConsultar
+            xDatos = {
+                xVista.txt_ape_pat: xPost.apellido_paterno,
+                xVista.txt_ape_mat: xPost.apellido_materno,
+                xVista.txt_nombres: xPost.nombres,
+                xVista.txt_fecha_post: str(xPost.fecha_registro),
+                xVista.txt_celular: xPost.celular,
+                xVista.txt_edad: str(xPost.calcular_edad()),
+                xVista.txt_area: xPost.requerimiento.area.nombre_area,
+                xVista.txt_puesto: xPost.requerimiento.area.puesto.nombre_puesto,
+                xVista.txt_regimen: xPost.requerimiento.regimen_laboral.nombre_regimen,
+                xVista.txt_sueldo_base: f"S/ {xPost.requerimiento.area.puesto.sueldo_base:.2f}",
+                xVista.txt_descuento: f"S/ {xPost.calcular_descuento():.2f}",
+                xVista.txt_sueldo_neto: f"S/ {xPost.calcular_sueldo_neto():.2f}"
+            }
+            for xCampo, xValor in xDatos.items():
+                xCampo.config(state="normal")
+                xCampo.delete(0, "end")
+                xCampo.insert(0, xValor)
+                xCampo.config(state="readonly")
 
         except ReclutamientoError as e:
             messagebox.showerror("Error", str(e))

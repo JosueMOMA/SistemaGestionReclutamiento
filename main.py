@@ -1,13 +1,12 @@
-# main.py
 import tkinter as tk
 from Vista.menu_principal_view import MenuPrincipalView
+from Modelo.empresa import Empresa
 
 if __name__ == "__main__":
-  # Creamos la ventana principal de Tkinter
-  root = tk.Tk()
+    root = tk.Tk()
 
-  # Instanciamos nuestra vista del menú principal pasándole la ventana raíz
-  app = MenuPrincipalView(root)
+    xEmpresaBase = Empresa("20123456789", "Asica Farms")
 
-  # Iniciamos el bucle principal de la aplicación
-  root.mainloop()
+    app = MenuPrincipalView(root, xEmpresaBase)
+
+    root.mainloop()

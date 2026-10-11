@@ -67,29 +67,41 @@ class RequerimientoController:
             messagebox.showerror("Error", "Verifique que los campos numéricos sean correctos.")
 
     def xConsultarRequerimiento(self):
-        xIdBusqueda = self.xVistaConsultar.txt_id.get()
+        xIdBusqueda = self.xVistaConsultar.txt_id.get().strip()
+        if not xIdBusqueda:
+            messagebox.showwarning("Advertencia", "Por favor ingrese un ID de requerimiento.")
+            return
+
         try:
             xReq = self.xEmpresa.consultar_requerimiento(xIdBusqueda)
-            
-            self.xVistaConsultar.txt_fecha_req.config(state="normal")
-            self.xVistaConsultar.txt_fecha_req.delete(0, "end")
-            self.xVistaConsultar.txt_fecha_req.insert(0, str(xReq.fecha_proceso))
-            self.xVistaConsultar.txt_fecha_req.config(state="readonly")
+            xVista = self.xVistaConsultar
 
-            self.xVistaConsultar.txt_nro_req.config(state="normal")
-            self.xVistaConsultar.txt_nro_req.delete(0, "end")
-            self.xVistaConsultar.txt_nro_req.insert(0, str(xReq.nro_requeridos))
-            self.xVistaConsultar.txt_nro_req.config(state="readonly")
+            xProfesion = xReq.grado_instruccion.profesion.nombre_profesion if xReq.grado_instruccion.profesion else "Ninguna"
 
-            self.xVistaConsultar.txt_area.config(state="normal")
-            self.xVistaConsultar.txt_area.delete(0, "end")
-            self.xVistaConsultar.txt_area.insert(0, xReq.area.nombre_area)
-            self.xVistaConsultar.txt_area.config(state="readonly")
-
-            self.xVistaConsultar.txt_estado.config(state="normal")
-            self.xVistaConsultar.txt_estado.delete(0, "end")
-            self.xVistaConsultar.txt_estado.insert(0, xReq.estado_requerimiento)
-            self.xVistaConsultar.txt_estado.config(state="readonly")
+            xDatos = {
+                xVista.txt_fecha_req: str(xReq.fecha_proceso),
+                xVista.txt_fecha_ing: str(xReq.fecha_inicio),
+                xVista.txt_nro_req: str(xReq.nro_requeridos),
+                xVista.txt_fecha_fin: str(xReq.fecha_fin_contrato),
+                xVista.txt_area: xReq.area.nombre_area,
+                xVista.txt_regimen: xReq.regimen_laboral.nombre_regimen,
+                xVista.txt_puesto: xReq.area.puesto.nombre_puesto,
+                xVista.txt_grado: xReq.grado_instruccion.nombre_grado,
+                xVista.txt_profesion: xProfesion,
+                xVista.txt_sueldo: f"S/ {xReq.area.puesto.sueldo_base:.2f}",
+                xVista.txt_experiencia: "Sí" if xReq.con_experiencia else "No",
+                xVista.txt_postulantes: str(xReq.obtener_nro_postulantes()),
+                xVista.txt_estado: xReq.estado_requerimiento
+            }
+            for xCampo, xValor in xDatos.items():
+                xCampo.config(state="normal")
+                xCampo.delete(0, "end")
+                xCampo.insert(0, xValor)
+                xCampo.config(state="readonly")
+            xVista.txt_descripcion.config(state="normal")
+            xVista.txt_descripcion.delete("1.0", "end")
+            xVista.txt_descripcion.insert("1.0", xReq.descripcion if xReq.descripcion else "Sin descripción")
+            xVista.txt_descripcion.config(state="disabled")
 
         except ReclutamientoError as e:
             messagebox.showerror("Error", str(e))

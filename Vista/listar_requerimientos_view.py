@@ -1,76 +1,75 @@
 import tkinter as tk
 from tkinter import ttk
 
-
 class ListarRequerimientosView:
 
-  def __init__(self, parent, registros=None):
-    self.ventana = tk.Toplevel(parent)
-    self.ventana.title("Listar | Listar Requerimientos")
-    self.ventana.grab_set()
+    def __init__(self, xParent, xRegistros=None):
+        self.ventana = tk.Toplevel(xParent)
+        self.ventana.title("Listar | Listar Requerimientos")
+        self.ventana.grab_set()
 
-    # --- CENTRAR LA VENTANA ---
-    ancho_ventana = 720
-    alto_ventana = 380
-    ancho_pantalla = self.ventana.winfo_screenwidth()
-    alto_pantalla = self.ventana.winfo_screenheight()
-    x = (ancho_pantalla // 2) - (ancho_ventana // 2)
-    y = (alto_pantalla // 2) - (alto_ventana // 2)
-    self.ventana.geometry(f"{ancho_ventana}x{alto_ventana}+{x}+{y}")
-    self.ventana.resizable(False, False)
+        # --- CENTRAR LA VENTANA ---
+        xAnchoVentana = 720
+        xAltoVentana = 380
+        xAnchoPantalla = self.ventana.winfo_screenwidth()
+        xAltoPantalla = self.ventana.winfo_screenheight()
+        xPosX = (xAnchoPantalla // 2) - (xAnchoVentana // 2)
+        xPosY = (xAltoPantalla // 2) - (xAltoVentana // 2)
+        self.ventana.geometry(f"{xAnchoVentana}x{xAltoVentana}+{xPosX}+{xPosY}")
+        self.ventana.resizable(False, False)
 
-    self.crear_formulario()
-    self.cargar_datos(registros or [])
+        self.crear_formulario()
+        self.cargar_datos(xRegistros or [])
 
-  def crear_formulario(self):
-    main_frame = tk.Frame(self.ventana, padx=20, pady=20)
-    main_frame.pack(fill=tk.BOTH, expand=True)
+    def crear_formulario(self):
+        xMainFrame = tk.Frame(self.ventana, padx=20, pady=20)
+        xMainFrame.pack(fill=tk.BOTH, expand=True)
 
-    # Título principal centrado
-    titulo = tk.Label(
-        main_frame,
-        text="Lista de Requerimientos",
-        font=("Arial", 16, "bold"),
-        anchor="center",
-    )
-    titulo.pack(pady=(10, 20))
+        # Título principal centrado
+        xTitulo = tk.Label(
+            xMainFrame,
+            text="Lista de Requerimientos",
+            font=("Arial", 16, "bold"),
+            anchor="center",
+        )
+        xTitulo.pack(pady=(10, 20))
 
-    # --- TABLA ---
-    columnas = (
-        "ID Proceso",
-        "Fecha Proceso",
-        "Fecha Ingreso",
-        "Fecha Fin Contrato",
-        "N° Requeridos",
-        "N° Postulantes",
-        "Estado",
-    )
-    anchos = (80, 95, 95, 115, 90, 100, 80)
+        # --- TABLA ---
+        xColumnas = (
+            "ID Proceso",
+            "Fecha Proceso",
+            "Fecha Ingreso",
+            "Fecha Fin Contrato",
+            "N° Requeridos",
+            "N° Postulantes",
+            "Estado",
+        )
+        xAnchos = (80, 95, 95, 115, 90, 100, 80)
 
-    self.tabla = ttk.Treeview(
-        main_frame, columns=columnas, show="headings", height=4
-    )
-    for col, ancho in zip(columnas, anchos):
-      self.tabla.heading(col, text=col)
-      self.tabla.column(col, width=ancho, anchor="center")
-    self.tabla.pack()
+        self.tabla = ttk.Treeview(
+            xMainFrame, columns=xColumnas, show="headings", height=4
+        )
+        for xCol, xAncho in zip(xColumnas, xAnchos):
+            self.tabla.heading(xCol, text=xCol)
+            self.tabla.column(xCol, width=xAncho, anchor="center")
+        self.tabla.pack()
 
-    # --- BOTÓN (Cerrar centrado) ---
-    frame_botones = tk.Frame(main_frame)
-    frame_botones.pack(pady=30)
+        # --- BOTÓN (Cerrar centrado) ---
+        xFrameBotones = tk.Frame(xMainFrame)
+        xFrameBotones.pack(pady=30)
 
-    btn_cerrar = tk.Button(
-        frame_botones, text="Cerrar", width=12, command=self.ventana.destroy
-    )
-    btn_cerrar.pack()
+        xBtnCerrar = tk.Button(
+            xFrameBotones, text="Cerrar", width=12, command=self.ventana.destroy
+        )
+        xBtnCerrar.pack()
 
-  def cargar_datos(self, registros):
-    """Carga las filas en la tabla.
+    def cargar_datos(self, xRegistros):
+        """Carga las filas en la tabla.
 
-    Cada registro debe ser una tupla o lista con este orden:
-    (ID Proceso, Fecha Proceso, Fecha Ingreso, Fecha Fin Contrato,
-     N° Requeridos, N° Postulantes, Estado)
-    """
-    self.tabla.delete(*self.tabla.get_children())
-    for fila in registros:
-      self.tabla.insert("", tk.END, values=fila)
+        Cada registro debe ser una tupla o lista con este orden:
+        (ID Proceso, Fecha Proceso, Fecha Ingreso, Fecha Fin Contrato,
+         N° Requeridos, N° Postulantes, Estado)
+        """
+        self.tabla.delete(*self.tabla.get_children())
+        for xFila in xRegistros:
+            self.tabla.insert("", tk.END, values=xFila)
