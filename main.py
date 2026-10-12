@@ -4,6 +4,7 @@ from Modelo.empresa import Empresa
 
 if __name__ == "__main__":
     root = tk.Tk()
+    # inicio
 
     xEmpresaBase = Empresa("20123456789", "Asica Farms")
 
