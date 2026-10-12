@@ -18,6 +18,18 @@ def validar_texto(valor, campo, obligatorio=True):
   return valor
 
 
+def validar_nombre(valor, campo):
+  """Valida nombres y apellidos: solo letras Unicode y espacios."""
+  texto = validar_texto(valor, campo)
+  if not all(caracter.isalpha() or caracter.isspace() for caracter in texto):
+    raise DatoInvalidoError(
+        f"El campo '{campo}' solo puede contener letras y espacios."
+    )
+  if not any(caracter.isalpha() for caracter in texto):
+    raise DatoInvalidoError(f"El campo '{campo}' debe contener al menos una letra.")
+  return " ".join(texto.split())
+
+
 def validar_booleano(valor, campo):
   if not isinstance(valor, bool):
     raise DatoInvalidoError(f"El campo '{campo}' debe ser verdadero o falso.")

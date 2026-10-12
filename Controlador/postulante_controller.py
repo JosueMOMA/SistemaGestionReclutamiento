@@ -4,6 +4,7 @@ from Modelo.postulante import Postulante
 from Modelo.tipo_afp import TipoAFP
 from Modelo.grado_instruccion import GradoInstruccion
 from Modelo.profesion import Profesion
+from Modelo.catalogos import AFP_DESCUENTOS
 
 class PostulanteController:
     """Controlador para gestionar la F02 y F04 del sistema SISGER."""
@@ -18,7 +19,7 @@ class PostulanteController:
             xIdRequerimiento = self.xVistaNuevo.combo_req.get().split(" - ")[0]
             xRequerimiento = self.xEmpresa.consultar_requerimiento(xIdRequerimiento)
 
-            xIdPostulante = self.xVistaNuevo.txt_id.get()
+            xIdPostulante = self.xEmpresa.siguiente_id_postulante()
             xFechaRegistro = self.xVistaNuevo.txt_fecha_post.get()
             xDni = self.xVistaNuevo.txt_dni.get()
             xApePaterno = self.xVistaNuevo.txt_ape_pat.get()
@@ -42,7 +43,16 @@ class PostulanteController:
 
             xConExperiencia = bool(self.xVistaNuevo.chk_experiencia_var.get())
             xNombreAfp = self.xVistaNuevo.combo_afp.get()
-            xTipoAfp = TipoAFP("AFP-1", xNombreAfp, 12.0)
+            xPorcentajeAfp = AFP_DESCUENTOS.get(xNombreAfp)
+            if xPorcentajeAfp is None:
+                raise ReclutamientoError(
+                    "Seleccione un sistema de pensiones válido."
+                )
+            xTipoAfp = TipoAFP(
+                f"AFP-{list(AFP_DESCUENTOS).index(xNombreAfp) + 1:02d}",
+                xNombreAfp,
+                xPorcentajeAfp,
+            )
 
             xPostulante = Postulante(
                 id_postulante=xIdPostulante,
@@ -67,18 +77,29 @@ class PostulanteController:
             )
 
             self.xEmpresa.registrar_postulante(xPostulante)
-            messagebox.showinfo("Éxito", "Postulante registrado correctamente.")
+            messagebox.showinfo(
+                "Éxito", "Postulante registrado correctamente.",
+                parent=self.xVistaNuevo.ventana,
+            )
             self.xVistaNuevo.ventana.destroy()
 
         except ReclutamientoError as e:
-            messagebox.showerror("Error de Validación", str(e))
+            messagebox.showerror(
+                "Error de Validación", str(e), parent=self.xVistaNuevo.ventana
+            )
         except Exception as e:
-            messagebox.showerror("Error", f"Verifique los datos ingresados. Detalle: {str(e)}")
+            messagebox.showerror(
+                "Error", f"Verifique los datos ingresados. Detalle: {str(e)}",
+                parent=self.xVistaNuevo.ventana,
+            )
 
     def xConsultarPostulante(self):
         xIdBusqueda = self.xVistaConsultar.txt_id.get().strip()
         if not xIdBusqueda:
-            messagebox.showwarning("Advertencia", "Por favor ingrese un ID de postulante.")
+            messagebox.showwarning(
+                "Advertencia", "Por favor ingrese un ID de postulante.",
+                parent=self.xVistaConsultar.ventana,
+            )
             return
 
         try:
@@ -105,4 +126,4 @@ class PostulanteController:
                 xCampo.config(state="readonly")
 
         except ReclutamientoError as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Error", str(e), parent=self.xVistaConsultar.ventana)

@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import ttk
 from tkcalendar import DateEntry 
 from Controlador.requerimiento_controller import RequerimientoController
+from Modelo.catalogos import PROFESIONES, PUESTOS_POR_AREA_Y_GRADO, REGIMENES
 
 class NuevoRequerimientoView:
 
@@ -12,7 +13,7 @@ class NuevoRequerimientoView:
         self.xEmpresa = xEmpresa
 
         ancho_ventana = 595
-        alto_ventana = 490
+        alto_ventana = 540
         ancho_pantalla = self.ventana.winfo_screenwidth()
         alto_pantalla = self.ventana.winfo_screenheight()
         x = (ancho_pantalla // 2) - (ancho_ventana // 2)
@@ -36,7 +37,7 @@ class NuevoRequerimientoView:
         titulo.grid(row=0, column=0, columnspan=3, pady=(0, 15), sticky="ew")
 
         self.txt_id = tk.Entry(main_frame, width=25)
-        self.txt_id.insert(0, "REQ-001")
+        self.txt_id.insert(0, self.xEmpresa.siguiente_id_requerimiento())
         self.txt_id.config(state="readonly")
 
         self.txt_fecha_req = DateEntry(
@@ -48,10 +49,11 @@ class NuevoRequerimientoView:
 
         self.combo_area = ttk.Combobox(
             main_frame,
-            values=["Tecnología", "Recursos Humanos", "Administración", "Operaciones"],
+            values=list(PUESTOS_POR_AREA_Y_GRADO),
             width=23, state="readonly",
         )
         self.combo_area.current(0)
+        self.combo_area.bind("<<ComboboxSelected>>", self.actualizar_puestos)
 
         self.txt_fecha_ing = DateEntry(
             main_frame, width=22, background="darkblue", foreground="white", 
@@ -65,13 +67,13 @@ class NuevoRequerimientoView:
 
         self.combo_puesto = ttk.Combobox(
             main_frame,
-            values=["Desarrollador Python", "Analista de RRHH", "Asistente Administrativo"],
+            values=[],
             width=23, state="readonly",
         )
-        self.combo_puesto.current(0)
+        self.combo_puesto.bind("<<ComboboxSelected>>", self.actualizar_sueldo)
 
         self.combo_regimen = ttk.Combobox(
-            main_frame, values=["CAS", "728", "Prácticas", "Locación"],
+            main_frame, values=list(REGIMENES),
             width=23, state="readonly",
         )
         self.combo_regimen.current(0)
@@ -85,7 +87,7 @@ class NuevoRequerimientoView:
 
         self.combo_profesion = ttk.Combobox(
             main_frame,
-            values=["Ingeniería de Sistemas", "Administración", "Contabilidad", "Psicología"],
+            values=PROFESIONES["Técnico"],
             width=23, state="disabled",
         )
 
@@ -94,6 +96,8 @@ class NuevoRequerimientoView:
             main_frame, text="Con experiencia", variable=self.chk_experiencia_var
         )
 
+        self.actualizar_puestos()
+
         campos = [
             ("ID Requerimiento:", self.txt_id),
             ("Fecha Requerimiento:", self.txt_fecha_req),
@@ -101,9 +105,9 @@ class NuevoRequerimientoView:
             ("Área:", self.combo_area),
             ("Fecha Ingreso:", self.txt_fecha_ing),
             ("Fecha Fin Contrato:", self.txt_fecha_fin),
-            ("Puesto:", self.combo_puesto),
-            ("Régimen Laboral:", self.combo_regimen),
             ("Grado Instrucción:", self.combo_grado),
+            ("Régimen Laboral:", self.combo_regimen),
+            ("Puesto:", self.combo_puesto),
             ("Profesión:", self.combo_profesion),
             ("Experiencia:", self.chk_experiencia),
         ]
@@ -128,23 +132,42 @@ class NuevoRequerimientoView:
         frame_botones.grid(row=fila_desc + 2, column=0, columnspan=3, sticky="n", pady=10)
 
         btn_cancelar = tk.Button(
-            frame_botones, text="Cancelar", width=12, command=self.ventana.destroy
+            frame_botones, text="Cancelar", width=12,bg="#A3A3A3", command=self.ventana.destroy
         )
         btn_cancelar.pack(side=tk.LEFT, padx=10)
 
         btn_guardar = tk.Button(
-            frame_botones, text="Guardar", width=12, bg="#4CAF50", fg="white", 
+            frame_botones, text="Guardar", width=12, bg="#4C7FAF", fg="white", 
             command=self.guardar_datos
         )
         btn_guardar.pack(side=tk.LEFT, padx=10)
 
-    def verificar_grado_instruccion(self, event):
+    def verificar_grado_instruccion(self, _event):
         grado_seleccionado = self.combo_grado.get()
-        if grado_seleccionado in ["Técnico", "Universitario"]:
+        if grado_seleccionado in PROFESIONES:
+            self.combo_profesion["values"] = PROFESIONES[grado_seleccionado]
+            self.combo_profesion.current(0)
             self.combo_profesion.config(state="readonly")
         else:
             self.combo_profesion.set("")
             self.combo_profesion.config(state="disabled")
+        self.actualizar_puestos()
+
+    def actualizar_puestos(self, _event=None):
+        area = self.combo_area.get()
+        grado = self.combo_grado.get()
+        puestos = [
+            nombre
+            for nombre, _ in PUESTOS_POR_AREA_Y_GRADO.get(area, {}).get(grado, [])
+        ]
+        self.combo_puesto["values"] = puestos
+        if puestos:
+            self.combo_puesto.current(0)
+        else:
+            self.combo_puesto.set("")
+
+    def actualizar_sueldo(self, _event=None):
+        """Mantiene el evento disponible para mostrar el sueldo en futuras mejoras."""
 
     def guardar_datos(self):
         self.xControlador.xRegistrarRequerimiento()

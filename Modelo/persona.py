@@ -3,7 +3,12 @@ import re
 from datetime import date
 
 from Modelo.excepciones import DatoInvalidoError
-from Modelo.validaciones import validar_digitos, validar_fecha, validar_texto
+from Modelo.validaciones import (
+    validar_digitos,
+    validar_fecha,
+    validar_nombre,
+    validar_texto,
+)
 
 
 class Persona:
@@ -55,7 +60,7 @@ class Persona:
 
   @apellido_paterno.setter
   def apellido_paterno(self, valor):
-    self.__apellido_paterno = validar_texto(valor, "Apellido Paterno")
+    self.__apellido_paterno = validar_nombre(valor, "Apellido Paterno")
 
   @property
   def apellido_materno(self):
@@ -63,7 +68,7 @@ class Persona:
 
   @apellido_materno.setter
   def apellido_materno(self, valor):
-    self.__apellido_materno = validar_texto(valor, "Apellido Materno")
+    self.__apellido_materno = validar_nombre(valor, "Apellido Materno")
 
   @property
   def nombres(self):
@@ -71,7 +76,7 @@ class Persona:
 
   @nombres.setter
   def nombres(self, valor):
-    self.__nombres = validar_texto(valor, "Nombres")
+    self.__nombres = validar_nombre(valor, "Nombres")
 
   @property
   def sexo(self):

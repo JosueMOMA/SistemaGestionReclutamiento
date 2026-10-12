@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 from Vista.nuevo_requerimiento_view import NuevoRequerimientoView
 from Vista.consultar_requerimiento_view import ConsultarRequerimientoView
 from Vista.nuevo_postulante_view import NuevoPostulanteView

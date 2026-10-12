@@ -58,7 +58,7 @@ class ListarPostulantesView:
         xFrameBotones.pack(pady=30)
 
         xBtnCerrar = tk.Button(
-            xFrameBotones, text="Cerrar", width=12, command=self.ventana.destroy
+            xFrameBotones, text="Cerrar", width=12,bg="#4C7FAF", fg="white", command=self.ventana.destroy
         )
         xBtnCerrar.pack()
 

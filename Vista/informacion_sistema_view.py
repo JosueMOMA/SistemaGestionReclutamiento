@@ -61,6 +61,6 @@ class InformacionSistemaView:
 
     # --- BOTÓN Gracias ---
     btn_gracias = tk.Button(
-        main_frame, text="Gracias", width=12, command=self.ventana.destroy
+        main_frame, text="Gracias", width=12,bg="#4C7FAF",fg="white", command=self.ventana.destroy
     )
     btn_gracias.pack(pady=5)

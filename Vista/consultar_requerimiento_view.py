@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox, ttk
 from Controlador.requerimiento_controller import RequerimientoController
 
 class ConsultarRequerimientoView:
@@ -21,6 +20,8 @@ class ConsultarRequerimientoView:
 
         self.crear_formulario()
         self.xControlador = RequerimientoController(xEmpresa=self.xEmpresa, xVistaConsultar=self)
+        self.txt_id.focus_set()
+        self.txt_id.icursor(tk.END)
 
     def crear_formulario(self):
         main_frame = tk.Frame(self.ventana, padx=20, pady=20)
@@ -36,9 +37,10 @@ class ConsultarRequerimientoView:
         frame_busqueda.grid(row=2, column=0, columnspan=2, sticky="w", padx=10, pady=(0, 10))
 
         self.txt_id = tk.Entry(frame_busqueda, width=30)
+        self.txt_id.insert(0, "REQ-")
         self.txt_id.pack(side=tk.LEFT, padx=(0, 5))
 
-        btn_buscar = tk.Button(frame_busqueda, text="🔍 Buscar", command=self.buscar_requerimiento)
+        btn_buscar = tk.Button(frame_busqueda, text="🔍 Buscar",bg="#4C7FAF",fg="white", command=self.buscar_requerimiento)
         btn_buscar.pack(side=tk.LEFT)
 
         self.txt_fecha_req = self.crear_campo_lectura(main_frame)
@@ -88,10 +90,10 @@ class ConsultarRequerimientoView:
         frame_botones = tk.Frame(main_frame)
         frame_botones.grid(row=fila_desc + 2, column=0, columnspan=2, sticky="n", pady=5)
 
-        btn_limpiar = tk.Button(frame_botones, text="Limpiar", width=12, command=self.limpiar_campos)
+        btn_limpiar = tk.Button(frame_botones, text="Limpiar", width=12,bg="#DDDDDD", command=self.limpiar_campos)
         btn_limpiar.pack(side=tk.LEFT, padx=10)
 
-        btn_cerrar = tk.Button(frame_botones, text="Cerrar", width=12, command=self.ventana.destroy)
+        btn_cerrar = tk.Button(frame_botones, text="Cerrar", width=12,bg="#A3A3A3",  command=self.ventana.destroy)
         btn_cerrar.pack(side=tk.LEFT, padx=10)
 
     def crear_campo_lectura(self, parent):
@@ -104,6 +106,9 @@ class ConsultarRequerimientoView:
 
     def limpiar_campos(self):
         self.txt_id.delete(0, tk.END)
+        self.txt_id.insert(0, "REQ-")
+        self.txt_id.focus_set()
+        self.txt_id.icursor(tk.END)
         campos = [
             self.txt_fecha_req, self.txt_fecha_ing, self.txt_nro_req, self.txt_fecha_fin,
             self.txt_area, self.txt_regimen, self.txt_puesto, self.txt_grado,

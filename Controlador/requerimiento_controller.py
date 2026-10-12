@@ -7,6 +7,7 @@ from Modelo.grado_instruccion import GradoInstruccion
 from Modelo.profesion import Profesion
 from Modelo.regimen_general import RegimenGeneral
 from Modelo.regimen_agrario import RegimenAgrario
+from Modelo.catalogos import REGIMENES, sueldo_puesto
 
 class RequerimientoController:
     """Controlador para gestionar la F01 y F03 del sistema SISGER."""
@@ -18,7 +19,7 @@ class RequerimientoController:
 
     def xRegistrarRequerimiento(self):
         try:
-            xIdProceso = self.xVistaNuevo.txt_id.get()
+            xIdProceso = self.xEmpresa.siguiente_id_requerimiento()
             xFechaProceso = self.xVistaNuevo.txt_fecha_req.get()
             xNroRequeridos = int(self.xVistaNuevo.spin_nro.get())
             xNombreArea = self.xVistaNuevo.combo_area.get()
@@ -31,7 +32,11 @@ class RequerimientoController:
             xConExperiencia = bool(self.xVistaNuevo.chk_experiencia_var.get())
             xDescripcion = self.xVistaNuevo.txt_descripcion.get("1.0", "end-1c")
 
-            xSueldoBase = 1500.0  # Valor de negocio simulado
+            xSueldoBase = sueldo_puesto(xNombreArea, xNombreGrado, xNombrePuesto)
+            if xSueldoBase is None:
+                raise ReclutamientoError(
+                    "El puesto seleccionado no corresponde al área y grado de instrucción."
+                )
             xPuesto = Puesto("P-001", xNombrePuesto, xSueldoBase)
             xArea = Area("A-001", xNombreArea, xPuesto)
 
@@ -39,7 +44,7 @@ class RequerimientoController:
             xProfesion = Profesion("PR-001", xNombreProfesion) if xConProfesion else None
             xGrado = GradoInstruccion("G-001", xNombreGrado, xConProfesion, xProfesion)
 
-            if xTipoRegimen == "728":
+            if REGIMENES.get(xTipoRegimen) == "general":
                 xRegimen = RegimenGeneral("RG-001", "Régimen General 728", "Mensual", True, 9.0)
             else:
                 xRegimen = RegimenAgrario("RA-001", "Régimen Agrario", "Mensual", True, 9.72, 102.50)
@@ -58,18 +63,32 @@ class RequerimientoController:
             )
 
             self.xEmpresa.registrar_requerimiento(xRequerimiento)
-            messagebox.showinfo("Éxito", "Requerimiento registrado correctamente.")
+            messagebox.showinfo(
+                "Éxito", "Requerimiento registrado correctamente.",
+                parent=self.xVistaNuevo.ventana,
+            )
             self.xVistaNuevo.ventana.destroy()
 
         except ReclutamientoError as e:
-            messagebox.showerror("Error de Validación", str(e))
+            messagebox.showerror("Error de Validación", str(e), parent=self.xVistaNuevo.ventana)
         except ValueError:
-            messagebox.showerror("Error", "Verifique que los campos numéricos sean correctos.")
+            messagebox.showerror(
+                "Error", "Verifique que los campos numéricos sean correctos.",
+                parent=self.xVistaNuevo.ventana,
+            )
+        except Exception as e:
+            messagebox.showerror(
+                "Error", f"No se pudo registrar el requerimiento: {e}",
+                parent=self.xVistaNuevo.ventana,
+            )
 
     def xConsultarRequerimiento(self):
         xIdBusqueda = self.xVistaConsultar.txt_id.get().strip()
         if not xIdBusqueda:
-            messagebox.showwarning("Advertencia", "Por favor ingrese un ID de requerimiento.")
+            messagebox.showwarning(
+                "Advertencia", "Por favor ingrese un ID de requerimiento.",
+                parent=self.xVistaConsultar.ventana,
+            )
             return
 
         try:
@@ -104,4 +123,4 @@ class RequerimientoController:
             xVista.txt_descripcion.config(state="disabled")
 
         except ReclutamientoError as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Error", str(e), parent=self.xVistaConsultar.ventana)
